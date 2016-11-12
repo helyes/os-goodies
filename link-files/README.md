@@ -17,7 +17,8 @@ $ ./link-files.sh link|init [-v] [-d|-dry] config_file
 - `-v|--verbose`: verbose mode
 - `-d|-dry`: prints commands only, no actual file operations
 
-❗ Optional parameters can not be combined. For example `-dv` will not enable verbose and dry run mode. Use `-d -v` format.
+❗ Optional parameters can not be combined. <br>
+Aggregated parameters `-dv` will not enable verbose and dry run mode. Use `-d -v` format.
 
 ## Warning
 

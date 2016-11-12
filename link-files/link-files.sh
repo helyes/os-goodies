@@ -23,6 +23,7 @@ function usage {
 	echo "link|init action"
 	echo "-v verbose mode"
 	echo "-d|-dry dry mode, prints commands only, no actual file operations"
+	echo "Optional parameters can not be combined. -dv is not allowed, use -d -v format"
 	echo
   echo "Example:"
   echo

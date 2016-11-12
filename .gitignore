@@ -7,7 +7,7 @@
 # ---------------------------
 
 *.conf
-
+crypt-file/fixtures/*.gpg
 
 # ---------------------------
 # Generic blacklist
