@@ -17,12 +17,17 @@
 ###########################################################
 function usage {
 	echo
-	echo "Usage : $0 [link|init] <config file>"
+	echo "Usage : $0 link|init [-v|--verbose] [-d|--dry] config_file"
   echo
+	echo "Where"
+	echo "link|init action"
+	echo "-v verbose mode"
+	echo "-d|-dry dry mode, prints commands only, no actual file operations"
+	echo
   echo "Example:"
   echo
   echo "  Userdotfiles.conf layout"
-  echo "  <link>=<source folder>"
+  echo "  link=source folder"
   echo
   echo "  link          : the symlink. Will point to <source folder>/link"
   echo "  source folder : the file origin folder"
@@ -56,13 +61,21 @@ function usage {
 
 }
 
-# must pass two parameters
-if [ "$#" -ne 2 ]; then
-    usage
-fi
+function log {
+	if [ ! "$DRY_RUN" ]
+	then
+		 printf "${1}\n"
+	else
+		 printf "\033[0;33mDRY:\033[0m ${1}\n"
+	fi
+}
 
-ACTION=$1
-CONFIG_FILE=$2
+function logVerbose {
+	if [ "$VERBOSE" == true ]
+	then
+		 log "$@"
+	fi
+}
 
 ###########################################################
 #                                                         #
@@ -74,6 +87,54 @@ function fatal {
 	echo
   exit 1
 }
+
+DRY=false
+VERBOSE=false
+
+for i in "$@"
+do
+	case $i in
+	    init|i|INIT|I)
+				if  [[ ! -z "${ACTION// }" ]]; then
+					usage noquit
+					fatal "Action already set to $ACTION. Only one is allowed, please remove '$i' from parameters"
+				fi
+	      ACTION="init"
+	      ;;
+			link|l|LINK|L)
+				if  [[ ! -z "${ACTION// }" ]]; then
+					usage noquit
+					fatal "Action already set to $ACTION. Only one is allowed, please remove '$i' from parameters"
+				fi
+	      ACTION="link"
+	      ;;
+	    -v|--verbose)
+	      VERBOSE=true
+	      ;;
+			-d|--dry)
+				DRY_RUN=true
+				;;
+
+	    *)
+			 CONFIG_FILE=$i
+			  #fatal "Unknown parameter $i"
+	    ;;
+	esac
+done
+
+logVerbose "Action: ${ACTION}, verbose: ${VERBOSE}, dry: ${DRY_RUN}, config: ${CONFIG_FILE}\n"
+
+
+#Checking parameters
+if  [[ -z "${ACTION// }" ]]; then
+	usage noquit
+	fatal "Action parameter [init|link] required"
+fi
+
+if  [[ -z "${CONFIG_FILE// }" ]]; then
+	usage noquit
+	fatal "Config file path required"
+fi
 
 #array contains config key - values
 files=()
@@ -88,7 +149,7 @@ files=()
 #                                                         #
 ###########################################################
 function readConfigFile {
-  printf "\n\033[1;37mParsing config file: ${CONFIG_FILE}\033[0m\n\n"
+  log "\033[1;37mParsing config file: ${CONFIG_FILE}\033[0m\n"
 
 	if [ ! -f "$CONFIG_FILE" ]
   then
@@ -104,7 +165,7 @@ function readConfigFile {
          continue
       fi
 
-      echo "$key : $value"
+      logVerbose "Entry found: $key -> $value"
 
       files+=($key)
       files+=($value)
@@ -114,11 +175,11 @@ function readConfigFile {
 	echo
 
 	if [ $((${#files[@]}%2)) -eq 1 ]; then
-    printf '%s : ' "${files[@]}"
+    log '%s : ' "${files[@]}"
     fatal "\nCould not parse config file. Most likely a key or a value is empty. See parsed elements above"
   fi
 
-	printf "\033[0;32mSuccess: ${CONFIG_FILE} loaded\033[0m\n\n";
+	log "\033[0;32mSuccess: $((${#files[@]}/2)) entries loaded from ${CONFIG_FILE}\033[0m\n";
 }
 
 
@@ -146,8 +207,11 @@ function sanityCheckLink {
  # create destination's file folder if it does not exist
  DESTINATION_FOLDER=$(dirname "${DESTINATION}")
  if [ ! -d "$DESTINATION_FOLDER" ]; then
-   echo "Creating directory: ${DESTINATION_FOLDER}"
-   mkdir -pv ${DESTINATION_FOLDER}
+   log "Creating directory: ${DESTINATION_FOLDER}"
+	 if [ ! "$DRY_RUN" ]
+	 then
+			mkdir -pv ${DESTINATION_FOLDER}
+	 fi
  fi
 
  # permission check
@@ -207,13 +271,14 @@ function sanityCheckInit {
 }
 
 
+
 ###########################################################
 #                                                         #
 # Symlinks files acording to config file                  #
 #                                                         #
 ###########################################################
 function link {
-	printf "\n\033[1;37mLinking files...\033[0m\n\n"
+	log "\033[1;37mLinking files...\033[0m\n"
 	for ((i=0;i<${#files[@]};i+=2))
 	do
 	  DESTINATION_RAW=${files[$i]}
@@ -236,17 +301,21 @@ function link {
 
 	  sanityCheckLink $DESTINATION $SOURCE_FILE
 
-	  #printf "Symlinking ${SOURCE_FILE} to ${DESTINATION}\n";
+	  logVerbose "Moving ${SOURCE_FILE} to ${DESTINATION}";
 	  COMMAND="ln -sfv ${SOURCE_FILE} ${DESTINATION}"
-	  echo "Executing ${COMMAND}"
-	  eval $COMMAND
+
+		log "Executing ${COMMAND}"
+		if [ ! "$DRY_RUN" ]
+		then
+			 eval $COMMAND
+		fi
 
 	  lnExitCode=$?
 
 	  if [ ${lnExitCode} -ne 0 ]; then
-	    fatal "Could not link ${DESTINATION}to ${SOURCE_FILE}"
+	    fatal "Could not link ${DESTINATION} to ${SOURCE_FILE}. Exit code: ${lnExitCode}"
 	  else
-	    printf "\033[0;32mSuccess: ${DESTINATION} -> ${SOURCE_FILE}\033[0m\n\n";
+			log "\033[0;32mSuccess: ${DESTINATION} -> ${SOURCE_FILE}\033[0m\n";
 	  fi
 
 	done
@@ -258,7 +327,7 @@ function link {
 #                                                         #
 ###########################################################
 function init {
-	printf "\n\033[1;37mInitializing...\033[0m\n\n"
+	log "\033[1;37mInitializing...\033[0m\n"
 
 	for ((i=0;i<${#files[@]};i+=2))
 	do
@@ -271,7 +340,7 @@ function init {
 	  eval DESTINATION_FOLDER=$DESTINATION_FOLDER_RAW
 	  eval SOURCE=$SOURCE_RAW
 
-		echo "DESTINATION_FOLDER: ${DESTINATION_FOLDER}"
+		#log "DESTINATION_FOLDER: ${DESTINATION_FOLDER}"
 	  if [[ "$DESTINATION_FOLDER" != */ ]]
 	  then
 	      DESTINATION_FOLDER="$DESTINATION_FOLDER/";
@@ -280,30 +349,31 @@ function init {
 	  DESTINATION_NAME=${SOURCE##*/}
 	  DESTINATION=${DESTINATION_FOLDER}${DESTINATION_NAME}
 
-		echo "SOURCE: ${SOURCE}"
-	  echo "DESTINATION: ${DESTINATION}"
-
+		#log "SOURCE: ${SOURCE}"
+	  #log "DESTINATION: ${DESTINATION}"
 
 	  sanityCheckInit $DESTINATION $SOURCE
 
 
-	  #printf "Symlinking ${SOURCE_FILE} to ${DESTINATION}\n";
+	  logVerbose "Moving ${SOURCE} to ${DESTINATION}";
 	  COMMAND="mv -v ${SOURCE} ${DESTINATION}"
-	  echo "Executing ${COMMAND}"
-	  eval $COMMAND
+	  log "Executing ${COMMAND}"
+		if [ ! "$DRY_RUN" ]
+		then
+			 eval $COMMAND
+		fi
 
-	  cpExitCode=$?
+	  mvExitCode=$?
 
-	  if [ ${cpExitCode} -ne 0 ]; then
-	    fatal "Could not move ${SOURCE} to ${DESTINATION}"
+	  if [ ${mvExitCode} -ne 0 ]; then
+	    fatal "Could not move ${SOURCE} to ${DESTINATION}. Exit code: ${mvExitCode}"
 	  else
-	    printf "\033[0;32mSuccess: ${SOURCE} moved to ${DESTINATION}\033[0m\n\n";
+	    log "\033[0;32mSuccess: ${SOURCE} moved to ${DESTINATION}\033[0m\n";
 	  fi
 
 	done
 
 }
-
 
 case "$ACTION" in
   init|i|INIT|I)
