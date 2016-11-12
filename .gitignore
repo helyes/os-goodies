@@ -1,0 +1,49 @@
+# ---------------------------
+# Minimal .gitignore
+# ---------------------------
+
+# ---------------------------
+# Project specific blacklist
+# ---------------------------
+
+*.conf
+
+
+# ---------------------------
+# Generic blacklist
+# ---------------------------
+
+# because we use macs - ignore OS generated files
+Thumbs.db
+.DS_Store
+
+
+# all files starting with . or ~
+.*
+~*
+
+# dependency directories
+/node_modules/
+
+
+# generated files
+/dist/
+dist-artifact
+
+
+# editor files
+*.sublime-project
+*.sublime-workspace
+
+
+# log files
+*.log
+
+
+# ---------------------------
+# Generic whitelist
+# ---------------------------
+
+# track these files, if they exist
+!.gitignore
+!.editorconfig
