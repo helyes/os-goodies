@@ -75,7 +75,7 @@ ls: /Users/andras/tmp/filerepo/project.txt: No such file or directory
 -rw-r--r--  1 andras  staff  5 12 Nov 19:11 /Users/andras/tmp/originallocation/project.txt
 ```
 
-Project.txt file sits in /Users/andras/tmp/originallocation/ folder.  /Users/andras/tmp/filerepo/project.txt does not exist.
+Project.txt file sits in `/Users/andras/tmp/originallocation` folder.  `/Users/andras/tmp/filerepo/project.txt` does not exist.
 
 Run script as below assuming the config file called `playground.conf`
 ```sh
@@ -166,7 +166,7 @@ $ ./link-files init user-dot-files.conf
 $ ./link-files link user-dot-files.conf
 ```
 
-It is strongly recommended to run the above scripts with `-d` parameter to see what the result would be.
+It is strongly recommended to run the above scripts first with `-d` parameter to see what the result would be.
 
 ### Result
 `~/.profile` is a symlink to `/work/.config/home/.profile` <br>
