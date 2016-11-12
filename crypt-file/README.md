@@ -77,9 +77,13 @@ gpg: AES256 encrypted data
 gpg: encrypted with 1 passphrase
 ```
 
-`Private-file.txt` created
+`Private-file.txt` created and its content is identical to the original, pre encrypt file
 ```sh
 $ ls -l /tmp/Private-file.*
 -rw-r--r--  1 andras  wheel  3503 13 Nov 09:03 /tmp/Private-file.txt
 -rw-r--r--  1 andras  wheel  1489 13 Nov 08:53 /tmp/Private-file.txt.gpg
+```
+
+```
+$ diff fixtures/Private-file.txt /tmp/Private-file.txt
 ```
