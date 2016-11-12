@@ -5,4 +5,4 @@ Small utilities/scripts to make life easier
 
 A config driven script to symlink files.<br>
 
-[More](link_files/README.md)
+[More](link-files/README.md)
