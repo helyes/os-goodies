@@ -30,7 +30,7 @@ Use this script only if you know what are you doing. Symlinks are forced to make
 List of `destination=source folder` entries.<br>
 Empty lines and lines starting with # are ignored
 
-``target_file]=source_folder``
+``target_file=source_folder``
 
 ## Example - Typical workflow
 
@@ -83,7 +83,7 @@ Run script as below assuming the config file called `playground.conf`
 
 ```
 
-Output
+**Output**
 
 ```
 Parsing config file: playground.conf
@@ -115,7 +115,7 @@ Run script as below with `link` parameter
 
 ```
 
-Output
+**Output**
 ```
 Parsing config file: playground.conf
 
