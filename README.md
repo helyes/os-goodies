@@ -23,3 +23,9 @@ Encrypts / decrypts a single file using <br>
 OSX automator task to move `Images` `Movies` and `Music` files from `~/Downloads` to `~/Downloads/Media` directory.
 
 [More](automator-downloads/README.md)
+
+## One liners
+
+List of handy one liners
+
+[More](oneliner/README.md)
