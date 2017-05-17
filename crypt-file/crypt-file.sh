@@ -2,7 +2,7 @@
 
 ################################################################################################################
 # Encrypt / decrypt single file by concatenating a password input by the user and a password file content.     #
-# On mac install gnupg via brew: "brew install gnupg"                                                          #
+# On mac install gnupg via brew: "brew install gpg1"                                                           #
 #                                                                                                              #
 # Parameters used for encryption:                                                                              #
 #                                                                                                              #
@@ -21,13 +21,25 @@
 # s2k-mode 3 - Selects how passphrases are mangled. 3 iterates it --s2k-count number of times                  #
 # s2k-count 33554432 - How many times the passphrase mangling is repeated. Valid range 1024 to 65011712        #
 #                                                                                                              #
-# 11:19 $ gpg --version                                                                                        #
+# 17:12 $ gpg --version                                                                                        #
+# gpg (GnuPG) 1.4.21                                                                                           #
+# Copyright (C) 2015 Free Software Foundation, Inc.                                                            #
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>                                #
+# This is free software: you are free to change and redistribute it.                                           #
+# There is NO WARRANTY, to the extent permitted by law.                                                        #
+#                                                                                                              #
+# Home: ~/.gnupg                                                                                               #
 # Supported algorithms:                                                                                        #
 # Pubkey: RSA, RSA-E, RSA-S, ELG-E, DSA                                                                        #
 # Cipher: IDEA, 3DES, CAST5, BLOWFISH, AES, AES192, AES256, TWOFISH,                                           #
-#        CAMELLIA128, CAMELLIA192, CAMELLIA256                                                                 #
+#         CAMELLIA128, CAMELLIA192, CAMELLIA256                                                                #
 # Hash: MD5, SHA1, RIPEMD160, SHA256, SHA384, SHA512, SHA224                                                   #
 # Compression: Uncompressed, ZIP, ZLIB, BZIP2                                                                  #
+#                                                                                                              #                                          #
+# Requires gnupg 1.4.X (will not work with v2.x.x versions)                                                    #
+# Installing on macos                                                                                          #
+# - brew install gpg1                                                                                          #
+# - /usr/local/opt/gnupg@1.4/libexec/gpgbin  (add bin folder to path)                                          #
 ################################################################################################################
 
 #Path to password file
@@ -60,7 +72,8 @@ function encrypt {
 
 function decrypt() {
   echo "Decrypting $FILE"
-  echo $CONCATENATEDPWD | gpg --batch --yes --passphrase-fd 0 $FILE  
+  # echo $CONCATENATEDPWD | gpg --batch --yes --passphrase-fd 0 $FILE
+  echo $CONCATENATEDPWD | gpg --passphrase-fd 0 $FILE
 }
 
 function usage {

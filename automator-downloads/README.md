@@ -12,11 +12,10 @@ All image, movie and music files that have been downloaded **prior** to installi
 
 ## Prerequisites
 
-The folder `~/Downloads/Media` must exits. Please crete it by finder or run the command in terminal below
+The folder `~/Downloads/Media` must exits. Please create it by finder or run the command in terminal below
 ```sh
 mkdir ~/Downloads/Media
 ```
-
 
 ## Setup
 
