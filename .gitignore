@@ -9,6 +9,10 @@
 *.conf
 crypt-file/fixtures/*.gpg
 
+#Secrets
+ctae.cfg
+
+
 # ---------------------------
 # Generic blacklist
 # ---------------------------
