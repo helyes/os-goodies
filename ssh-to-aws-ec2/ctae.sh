@@ -4,7 +4,9 @@
 # Connection shortcuts can be configured in a config file, please run script with -s parameter to generate a sample config file
  
 # Default config file
-CONFIG_FILE=./ctae.cfg
+CONFIG_FILE_NAME=ctae.cfg
+
+CONFIG_FILE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/${CONFIG_FILE_NAME}"
 
 usage () {
   printf "\\nUsage:\\n\\n"
