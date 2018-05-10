@@ -13,10 +13,11 @@ INTOUCHABLES="master, develop, production, hotfix/.*, pilot, shiftcare_developme
 
 usage () {
   printf "\\nUsage:\\n\\n"
-  printf "%s -m|--main main branch [-f|--filter branhc filter] [-d|--dry dry run[ [-l|--local] local branches only [-h|--help print this help] \\n\\n" "$0"
+  printf "%s -m|--main main branch [-f|--filter branch filter] [-d|--dry dry run[ [-l|--local] local branches only [-h|--help print this help] \\n\\n" "$0"
   printf "\\t-m: name of the main branch. The branch where all branches should be merged\\n"
   printf "\\t-f: only branches matches this filter will be listed. -f=fix, update will check branhces only with the word fix or update in branch name\\n"
   printf "\\t-d: dry run, echo only\\n"
+  printf "\\t-l: checks local branches only only\\n"
   printf "\\t-h: print help\\n\\n"
   printf "Note: Keep in mind that git can not delete the branch it is currently sitting. Checkout main branch\\n"
   printf "      Check INTOUCHABLES variable in script to see what branches are exlcuded from delete\\n\\n"
