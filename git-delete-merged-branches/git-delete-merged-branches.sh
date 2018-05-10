@@ -3,15 +3,17 @@
 # Deletes branches that are merged into master branch
 #
 # Todo: create functions to make it more human. It started as a one liner and gradually escalated to this
+# Listing stale branches
+#  for branch in `git branch -r | grep -v HEAD`;do echo -e `git show --format="%ci %cr" $branch | head -n 1` \\t$branch; done | sort -r
 
 
 
 # Branches to exlude from delete
-INTOUCHABLES="master, develop, production, hotfix.*, pilot, shiftcare_development, release.*"
+INTOUCHABLES="master, develop, production, hotfix/.*, pilot, shiftcare_development, release.*"
 
 usage () {
   printf "\\nUsage:\\n\\n"
-  printf "%s -m|--main main branch [-f|--filter branhc filter] [-d|--dry dry run[ [-h|--help print this help] \\n\\n" "$0"
+  printf "%s -m|--main main branch [-f|--filter branhc filter] [-d|--dry dry run[ [-l|--local] local branches only [-h|--help print this help] \\n\\n" "$0"
   printf "\\t-m: name of the main branch. The branch where all branches should be merged\\n"
   printf "\\t-f: only branches matches this filter will be listed. -f=fix, update will check branhces only with the word fix or update in branch name\\n"
   printf "\\t-d: dry run, echo only\\n"
@@ -110,8 +112,8 @@ LINES=$(echo "$MERGED_BRANCHES" | wc -l)
 if [ "$LINES" -eq "1" ]; then
     MERGED_BRANCHES_NORMALIZED=$MERGED_BRANCHES
 else 
-    # removing duplicated whitespaces
-    MERGED_BRANCHES_NORMALIZED=$(echo $MERGED_BRANCHES | sed -n '/.*/s/  */ /gp')
+    # removing duplicated whitespaces - dont quote ${MERGED_BRANCHES}
+    MERGED_BRANCHES_NORMALIZED=$(sed -n '/.*/s/  */ /gp' <<< ${MERGED_BRANCHES})    
 fi
  
 #loading branches into an array
@@ -138,7 +140,7 @@ echo
 for index in "${!array[@]}"
 do
   BRANCH=${array[index]} 
-  printf "Deleting branch "
+  printf "[%d/%d] Deleting branch " $((index+1)) ${#array[@]}
 
   # different path for local/remote branches
   if [[ $BRANCH = *"remotes/origin"* ]]; then
