@@ -9,7 +9,8 @@
 
 
 # Branches to exlude from delete
-INTOUCHABLES="master, develop, production, hotfix/.*, pilot, shiftcare_development, release.*"
+#INTOUCHABLES="master, develop, production, hotfix/.*, pilot, shiftcare_development, release.*"
+INTOUCHABLES="master, develop, production, hotfix/.*, pilot, shiftcare_development"
 
 usage () {
   printf "\\nUsage:\\n\\n"

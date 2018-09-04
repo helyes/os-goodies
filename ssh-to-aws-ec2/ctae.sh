@@ -10,9 +10,12 @@ CONFIG_FILE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/${CONFIG_FILE_NAM
 
 usage () {
   printf "\\nUsage:\\n\\n"
-  printf "%s -i|--instance instance to connect [-l|--list list configured hosts] [-c|--config config file location] [-p|privatekey private key location] [-u|username ec2 username] [-h|--help print help] \\n\\n" "$0"
+  printf "%s -i|--instance instance to connect [-l|--list list configured hosts] [-g|--get returns value for key] [-c|--config config file location] [-p|privatekey private key location] [-u|username ec2 username] [-h|--help print help] \\n\\n" "$0"
   printf "\\t-i: the instance to connect to. Must present in config file as key\\n"
   printf "\\t-l: lists configured instances\\n"
+  printf "\\t-c: config file location\\n"
+  printf "\\t-k: prints config file location\\n"
+  printf "\\t-g: returns value for given key in config file\\n"
   printf "\\t-c: config file, defaults to ./ctae.cfg\\n"
   printf "\\t-p: private key file path\\n"  
   printf "\\t-u: ec2 user name\\n"
@@ -83,6 +86,21 @@ listConfiguredInstances () {
   exit 0
 }
 
+printconfiglocation () {
+  echo "$CONFIG_FILE"
+  exit 0
+}
+
+# Returns key's value from config file
+getConfigValueForKey () { 
+  CONFIG_ENTRY=$(grep -v "#" "${CONFIG_FILE}" | grep "^$1")
+  local VALUE=${CONFIG_ENTRY#*=}
+  #trim leading and trailing whitespaces
+  VALUE="$(echo -e "${VALUE}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+  [ -z "$VALUE" ] && echo "$1 is not configured in ${CONFIG_FILE}" && exit 9
+  echo "$VALUE"
+}
+
 # Checks if given parameters are executable. Accepts multiple parameters.
 # 
 # To check if aws and ls commands are installed, call it as 'checkInstalledDependencies aws ls'
@@ -111,6 +129,9 @@ do
       shift # argument
       shift # value
       ;;
+      -k|--configlocation)
+      printconfiglocation
+      ;;
       -p|--privatekey)
       PRIVATE_KEY_FILE="$2"
       shift # argument
@@ -124,7 +145,13 @@ do
       -l|--list)
       listConfiguredInstances
       shift # value
-      ;;    
+      ;;
+      -g|--get)
+      INSTANCE="$2"
+      checkFilesExist "${CONFIG_FILE}"
+      getConfigValueForKey "$INSTANCE"
+      exit 0
+      ;;
       -h|--help)
       usage
       shift # value
@@ -149,12 +176,6 @@ if [ -z "$INSTANCE" ]; then
   printf "Instance parameter is mandatory\\n\\n"
   usage
 fi
-
-getConfigValueForKey () { 
-  CONFIG_ENTRY=$(grep -v "#" "${CONFIG_FILE}" | grep "^$1")
-  local VALUE=${CONFIG_ENTRY#*=}   
-  echo "$VALUE"
-}
 
 if [ -z "$PRIVATE_KEY_FILE" ]; then
   PRIVATE_KEY_FILE=$(getConfigValueForKey  "CONFIG_PRIVATE_KEY_FILE")
