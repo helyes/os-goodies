@@ -1,0 +1,3 @@
+# source below line to enable code completition
+
+complete -W "$(grep -v "#" $(ctae.sh -k) | grep -v "CONFIG" | grep . | sed -e 's/=.*//g'| tr '\n' ' ' | sort)" ctae.sh
