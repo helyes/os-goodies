@@ -131,13 +131,30 @@ if [ "${#array[@]}" = "0" ]; then
     exit 0;
 fi
 
-read -rp "Delete these branches (y/n)? " confirm
+read -rp "Delete these branches (y/n/a)? " confirm
 
-if [ "$confirm" != "y" ]; then 
+if [ "$confirm" == "a" ]; then
+  echo "Deleting all branches with auto confirm";
+  AUTO_CONFIRM="Y"
+elif [ "$confirm" != "y" ]; then
   echo "Aborting" && exit 9; 
 fi
 
 echo
+
+confirmDelete () {
+   if [ "$AUTO_CONFIRM" == "Y" ]; then
+    return 1;
+   else
+    read -rp "Execute: ${COMMAND} [Yy]? " -n 1
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+      return 1
+    fi
+  fi
+  return 0
+}
 
 for index in "${!array[@]}"
 do
@@ -154,13 +171,31 @@ do
     COMMAND="git branch -d ${BRANCH}"
   fi
 
-  # dry mode prints only
-  if [ -n "${DRY}" ]  ; then
-    echo "Dry run, would execute: ${COMMAND}"
+
+  confirmDelete
+  shouldDelete=$?
+  if [[ shouldDelete -eq 1 ]]
+  then
+    # dry mode prints only
+    if [ -n "${DRY}" ]  ;
+    then
+      echo "Dry run, would execute: ${COMMAND}"
+    else
+      #echo "Executing: ${COMMAND}"
+      ${COMMAND}
+    fi
   else
-    echo "Executing: ${COMMAND}"
-    ${COMMAND}  
+      echo "Skipping ${BRANCH}"
   fi
+  #echo "Executing: ${COMMAND}"
+  # read -rp "Execute: ${COMMAND} [Yy]? " -n 1
+  # echo   # (optional) move to a new line
+  # if [[ $REPLY =~ ^[Yy]$ ]]
+  # then
+  #      echo "Executing: ${COMMAND}"
+  #      #${COMMAND}
+  # fi
+
   retVal=$?    
   echo
   if [ $retVal -ne 0 ]; then
