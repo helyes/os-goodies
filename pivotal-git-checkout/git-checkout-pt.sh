@@ -1,8 +1,19 @@
 #!/bin/bash
 #
+# Git plugin to create branch for a given pt ticket. See usage.
 #
- 
-PIVOTAL_PROJECT_ID=1933485
+# Easiest use is to click on "ID" on pt to put ticket number on clipboard then `git ptbranch`
+# Output:
+# Branch pt-1234567890-my-great-feature-request does not exists. Creating
+# Copying git command to clipboard:
+# git checkout -b pt-1234567890-my-great-feature-request
+#
+# Now all you need is paste clipboard and hit enter.
+
+
+# These values below can be hardcoded here, i am personally using the ctae (https://github.com/helyes/os-goodies/blob/master/ssh-to-aws-ec2/ctae.sh) script so i can push all my scripts without worrying about secrets.
+# pivotal project id grab it from the end of url: https://www.pivotaltracker.com/n/projects/<project id>
+PIVOTAL_PROJECT_ID=$(ctae.sh -g pivotal_project_id)
 # create an api token on https://www.pivotaltracker.com/profile and chuck it below
 PIVOTAL_API_TOKEN=$(ctae.sh -g pivotal_api_token)
 
